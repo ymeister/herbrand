@@ -20,6 +20,8 @@
         projectFor = system: import ./default.nix { inherit system inputs; };
 
         shellFor = system: import ./shell.nix { inherit system inputs; };
+
+        checksFor = system: import ./checks.nix { inherit system inputs; };
     in {
       packages = eachSystem (system:
         let project = projectFor system;
@@ -30,6 +32,8 @@
       devShells = eachSystem (system: {
         default = shellFor system;
       });
+
+      checks = eachSystem checksFor;
     };
 
   nixConfig = {

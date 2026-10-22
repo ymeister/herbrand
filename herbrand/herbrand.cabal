@@ -9,10 +9,18 @@ common common
     default-extensions:
         DuplicateRecordFields
         OverloadedRecordDot
+        PatternSynonyms
+        TypeFamilies
     ghc-options:        -Wall
 
 library
     import:             common
     hs-source-dirs:     src
-    exposed-modules:    Herbrand
-    build-depends:      base
+    exposed-modules:
+        Herbrand
+        Herbrand.Eval
+        Herbrand.Term
+    build-depends:
+        base
+      , deepseq
+      , variant

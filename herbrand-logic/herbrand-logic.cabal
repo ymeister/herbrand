@@ -1,0 +1,31 @@
+cabal-version:      3.4
+name:               herbrand-logic
+version:            0.1.0.0
+synopsis:           Logical connectives, quantifiers, and comparisons as herbrand symbols
+build-type:         Simple
+
+common common
+    default-language:   GHC2024
+    default-extensions:
+        DuplicateRecordFields
+        OverloadedRecordDot
+        PatternSynonyms
+    ghc-options:        -Wall
+
+library
+    import:             common
+    hs-source-dirs:     src
+    exposed-modules:
+        Herbrand.Propositionals
+        Herbrand.Propositionals.Conjunction
+        Herbrand.Propositionals.Disjunction
+        Herbrand.Propositionals.Equivalence
+        Herbrand.Propositionals.Implication
+        Herbrand.Propositionals.Negation
+        Herbrand.Propositionals.Variable
+    build-depends:
+        base
+      , containers
+      , deepseq
+      , herbrand
+      , text
