@@ -1,6 +1,7 @@
 # cabal
 dist/
 dist-newstyle/
+cabal.project.local
 
 # stack
 .stack-work/

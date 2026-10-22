@@ -1,0 +1,18 @@
+cabal-version:      3.4
+name:               herbrand
+version:            0.1.0.0
+synopsis:           Extensible logical and algebraic structures over an open variant
+build-type:         Simple
+
+common common
+    default-language:   GHC2024
+    default-extensions:
+        DuplicateRecordFields
+        OverloadedRecordDot
+    ghc-options:        -Wall
+
+library
+    import:             common
+    hs-source-dirs:     src
+    exposed-modules:    Herbrand
+    build-depends:      base
