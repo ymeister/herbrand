@@ -1,0 +1,20 @@
+# cabal
+dist/
+dist-newstyle/
+
+# stack
+.stack-work/
+
+# GHC
+*.hi
+*.o
+*.dyn_hi
+*.dyn_o
+
+# nix
+result
+result-*
+.direnv/
+
+# design notes
+docs/
