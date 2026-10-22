@@ -19,7 +19,7 @@ module Main (main) where
 
 import Data.Map.Strict qualified as Map
 
-import Herbrand (S, Term, eval)
+import Herbrand (S, Signature, Term (Term), eval, type (:<))
 import Herbrand.Propositionals
 
 type Core = '[S Var, S Neg, S (:&:)]
@@ -37,6 +37,38 @@ pAndNotQ = Var "p" :&: Neg (Var "q")
 rule :: Term Propositionals
 rule = Var "p" :&: Neg (Var "q") :->: Var "r"
 ```
+
+## Partially filled symbols
+
+A symbol in the list may already have some of its holes filled. The term
+then fills only the rest. `(:&:) Literal` is a conjunction whose left child
+is fixed to a literal, a term over `Var` alone, and whose right child is the
+term being defined.
+
+```haskell
+type Literal = Term '[S Var]
+
+type Clause = '[S Var, S ((:&:) Literal)]
+```
+
+A `Term Clause` is a variable, or a literal conjoined with another clause: a
+right-nested conjunction of variables and nothing else. The constructor for
+the filled symbol takes a `Literal` on the left.
+
+```haskell
+(&:) :: (Literal :&: Term s) :< Signature s => Literal -> Term s -> Term s
+lit &: rest = Term (MkConj lit rest)
+
+infixr 3 &:
+
+clause :: Term Clause
+clause = Var "p" &: Var "q" &: Var "r"
+```
+
+A conjunction on the left, or a `Neg` anywhere, does not typecheck, because
+`Clause` has no symbol for it at that position. Every interpretation defined
+on the symbols still applies, so `eval` and `show` work on `clause` as they
+do on `rule`.
 
 ## Evaluation
 
@@ -66,13 +98,14 @@ parsed :: Term Propositionals
 parsed = read "p & ~q -> r"
 ```
 
-`main` prints both formulas, then `True` twice.
+`main` prints the formulas, then `True` twice.
 
 ```haskell
 main :: IO ()
 main = do
   print pAndNotQ
   putStrLn printed
+  print clause
   print holds
   print $ parsed == rule
 ```
