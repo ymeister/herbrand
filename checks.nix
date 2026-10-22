@@ -6,10 +6,11 @@ let nix-haskell = import inputs.nix-haskell { inherit system inputs; };
     project = nix-haskell (import ./project.nix);
     pkgs = project.pkgs;
     ghc = project.haskell-nix.project.ghcWithPackages (ps: [ ps.herbrand ps.herbrand-logic ]);
+    markdown-unlit = pkgs.haskellPackages.markdown-unlit;
 
 in {
-  readme = pkgs.runCommand "readme" { nativeBuildInputs = [ ghc ]; } ''
-    ghc -Wall -outputdir . -o readme ${./README.lhs}
+  readme = pkgs.runCommand "readme" { nativeBuildInputs = [ ghc markdown-unlit ]; } ''
+    ghc -Wall -pgmL markdown-unlit -outputdir . -o readme ${./README.lhs}
     ./readme > $out
   '';
 }
