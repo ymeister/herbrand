@@ -116,17 +116,15 @@ parsed :: Term Propositionals
 parsed = read "p & ~q -> r"
 ```
 
-`main` prints the formulas, then `True` twice.
-
 ```haskell
 main :: IO ()
 main = do
-  print pAndNotQ
-  putStrLn printed
-  print clause
-  print disjunctive
-  print conjunctive
-  print mixedDNF
-  print holds
-  print $ parsed == rule
+  print pAndNotQ          -- p & ~q
+  putStrLn printed        -- p & ~q -> r
+  print clause            -- p & ~q & r
+  print disjunctive       -- p & r | q & r
+  print conjunctive       -- (p | q) & r
+  print mixedDNF          -- ~True | ~p | q
+  print holds             -- True
+  print $ parsed == rule  -- True
 ```
