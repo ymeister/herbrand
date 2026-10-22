@@ -4,6 +4,8 @@ module Herbrand.Term
   ( Term (Term)
   , Signature
   , type (:<)
+  , ReduceVariant
+  , reduceTerm
   , ReadV (..)
   , Herbrandization
   , ApplyAllArgs
@@ -12,7 +14,7 @@ module Herbrand.Term
 
 import Control.DeepSeq (NFData)
 import Data.Kind (Constraint, Type)
-import Data.Variant (V, pattern V, toVariantHead, toVariantTail, type (:<))
+import Data.Variant (ReduceVariant, V, pattern V, reduceVariant, toVariantHead, toVariantTail, type (:<))
 import Text.Read (Read (..), ReadPrec, pfail, readListPrecDefault, (+++))
 
 import Herbrand.Eval (Eval (..))
@@ -94,3 +96,20 @@ type family ApplyAllArgs f x where
 --   '[S Var, S (:&:), S ((:|:) (Clause s))] :: [Type]
 type S :: k -> Type
 data S f
+
+--------------------------------------------------------------------------------
+-- Folding
+--------------------------------------------------------------------------------
+
+-- | Applies one function, polymorphic over the constraint @c@, to whichever
+-- symbol the term holds.
+--
+-- Example:
+--   reduceTerm @Show show (Var "p" :&: Var "q" :: Term Propositionals) => "p & q"
+reduceTerm
+  :: forall c s r
+   . ReduceVariant c (Signature s)
+  => (forall x. c x => x -> r)
+  -> Term s
+  -> r
+reduceTerm f (MkTerm v) = reduceVariant @c f v
