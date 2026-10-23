@@ -7,8 +7,8 @@ module Herbrand.Term
   , ReduceVariant
   , reduceTerm
   , ReadV (..)
-  , Herbrandization
-  , ApplyAllArgs
+  , Saturated
+  , Saturate
   , S
   ) where
 
@@ -52,7 +52,7 @@ instance Eval ctx (V (Signature s)) y => Eval ctx (Term s) y where
 -- Example:
 --   Signature '[S Var, S (:&:)] => '[Var, Term '[S Var, S (:&:)] :&: Term '[S Var, S (:&:)]]
 type Signature :: [Type] -> [Type]
-type Signature s = Herbrandization s (Term s)
+type Signature s = Saturated s (Term s)
 
 --------------------------------------------------------------------------------
 -- Reading
@@ -70,25 +70,25 @@ instance (Read x, ReadV xs) => ReadV (x : xs) where
   readPrecV = (toVariantHead <$> readPrec) +++ (toVariantTail <$> readPrecV)
 
 --------------------------------------------------------------------------------
--- Herbrandization
+-- Saturation
 --------------------------------------------------------------------------------
 
 -- Example:
---   Herbrandization '[S Var, S (:&:)] t => '[Var, t :&: t]
---   Herbrandization '[] t => '[]
-type Herbrandization :: [Type] -> Type -> [Type]
-type family Herbrandization s x where
-  Herbrandization '[] x = '[]
-  Herbrandization (S f : fs) x = ApplyAllArgs f x : Herbrandization fs x
+--   Saturated '[S Var, S (:&:)] t => '[Var, t :&: t]
+--   Saturated '[] t => '[]
+type Saturated :: [Type] -> Type -> [Type]
+type family Saturated s x where
+  Saturated '[] x = '[]
+  Saturated (S f : fs) x = Saturate f x : Saturated fs x
 
 -- Example:
---   ApplyAllArgs (:&:) t => t :&: t
---   ApplyAllArgs ((:&:) a) t => a :&: t
---   ApplyAllArgs Var t => Var
-type ApplyAllArgs :: k -> Type -> Type
-type family ApplyAllArgs f x where
-  ApplyAllArgs (f :: Type) x = f
-  ApplyAllArgs (f :: Type -> k) x = ApplyAllArgs (f x) x
+--   Saturate (:&:) t => t :&: t
+--   Saturate ((:&:) a) t => a :&: t
+--   Saturate Var t => Var
+type Saturate :: k -> Type -> Type
+type family Saturate f x where
+  Saturate (f :: Type) x = f
+  Saturate (f :: Type -> k) x = Saturate (f x) x
 
 -- | Marks a symbol in a symbol list, whatever the symbol's kind.
 --
